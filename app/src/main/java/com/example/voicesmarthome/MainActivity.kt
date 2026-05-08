@@ -1,21 +1,41 @@
 package com.example.voicesmarthome
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.Manifest
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 
+private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var recorder: MelSpectrogramRecorder
     private lateinit var container: FrameLayout
+    private lateinit var recordButton: Button
+    //private lateinit var recorder = MelSpectrogramRecorder(this, {}, {})
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        recorder = MelSpectrogramRecorder(this, {}, {})
+
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION) //request recording permission
+
         setContentView(R.layout.activity_main)
 
         // Referencia al contenedor
         container = findViewById(R.id.content_container)
+
+        // Referencia al boton de grabacion
+        recordButton = findViewById(R.id.record_button)
 
         // Pantalla inicial
         loadScreen(R.layout.dashboard_layout)
@@ -46,6 +66,41 @@ class MainActivity : AppCompatActivity() {
             loadScreen(R.layout.confirm_layout)
             selectTab(tabConfirm)
         }
+
+        recordButton.setOnClickListener {  }
+
+        recordButton.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    recorder.start()
+                    true
+                }
+
+                MotionEvent.ACTION_UP -> {
+                    recorder.stop()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    // Requesting permission to RECORD_AUDIO
+    private var permissionToRecordAccepted = false
+    private var permissions: Array<String> = arrayOf(Manifest.permission.RECORD_AUDIO)
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        permissionToRecordAccepted = if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        } else {
+            false
+        }
+        if (!permissionToRecordAccepted) finish()
     }
 
     // Cambiar pantalla
