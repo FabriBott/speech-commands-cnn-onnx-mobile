@@ -9,8 +9,10 @@ import androidx.core.content.ContextCompat;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtException;
@@ -60,12 +62,12 @@ public class MelSpectrogramRecorder {
     /** Capture sample rate (Hz). */
     public static final int SAMPLE_RATE = 16_000;
     /** FFT window length – must be a power of two. */
-    public static final int FFT_SIZE = 1_024;
+    public static final int FFT_SIZE = 2_048;
     /**
      * Hop size (samples). 50 % overlap keeps temporal resolution high while
      * halving redundant computation.
      */
-    public static final int HOP_SIZE = FFT_SIZE / 2;
+    public static final int HOP_SIZE = 512;//FFT_SIZE / 2;
 
     // ── Mel filter-bank parameters ────────────────────────────────────────────
     public static final int NUM_MEL_BANDS = 128;
@@ -253,8 +255,7 @@ public class MelSpectrogramRecorder {
 
         synchronized (frameLock) { frameBuffer.clear(); }
 
-        dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(
-                SAMPLE_RATE, FFT_SIZE, FFT_SIZE - HOP_SIZE);
+        dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(SAMPLE_RATE, FFT_SIZE, FFT_SIZE - HOP_SIZE);
 
         dispatcher.addAudioProcessor(buildMelProcessor());
 
@@ -344,6 +345,7 @@ public class MelSpectrogramRecorder {
             @Override
             public boolean process(AudioEvent audioEvent) {
                 float[] audioBuffer = audioEvent.getFloatBuffer();
+                Log.i(TAG, Arrays.toString(audioBuffer));
                 if (audioBuffer.length < FFT_SIZE) return true;
 
                 // 1. Hann window
@@ -356,6 +358,7 @@ public class MelSpectrogramRecorder {
                 float[] real = windowed.clone();
                 float[] imag = new float[FFT_SIZE];
                 fft.forwardTransform(real);
+                fft.forwardTransform(imag);
 
                 float[] power = new float[numBins];
                 for (int k = 0; k < numBins; k++) {
@@ -370,6 +373,7 @@ public class MelSpectrogramRecorder {
                 float[] logMel = new float[NUM_MEL_BANDS];
                 for (int m = 0; m < NUM_MEL_BANDS; m++) {
                     logMel[m] = 10f * (float) Math.log10(melEnergies[m] + LOG_OFFSET);
+                    //logMel[m] = 10f * (float) Math.log10(audioBuffer[m] + LOG_OFFSET);
                 }
 
                 // 5. Build frame and push into circular buffer
@@ -415,14 +419,15 @@ public class MelSpectrogramRecorder {
      */
     static OnnxTensorInput packFramesToTensor(List<MelFrame> frames) {
         int numFrames = frames.size();
-        float[] data  = new float[numFrames * NUM_MEL_BANDS];
+        float[] data  = new float[MAX_FRAMES * NUM_MEL_BANDS];
+        Arrays.fill(data, 0);
 
         for (int t = 0; t < numFrames; t++) {
             System.arraycopy(frames.get(t).melBands, 0,
                     data, t * NUM_MEL_BANDS, NUM_MEL_BANDS);
         }
 
-        long[] shape = {1L, 1L, (long) NUM_MEL_BANDS, (long) numFrames};
+        long[] shape = {1L, 1L, (long) NUM_MEL_BANDS, (long) MAX_FRAMES};
 
         double startTs = frames.get(0).timeStampSeconds;
         double endTs   = frames.get(numFrames - 1).timeStampSeconds;

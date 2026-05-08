@@ -8,9 +8,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import ai.onnxruntime.NodeInfo;
 import ai.onnxruntime.OnnxTensor;
@@ -27,11 +30,25 @@ public class ONNXModelRunner {
     private OrtEnvironment env;
     private OrtSession session;
     private Context context;
+
+    private static final Map<Integer, String> indexCommandMap = Map.of(
+            0, "yes",
+            1, "no",
+            2, "up",
+            3, "down",
+            4, "left",
+            5, "right",
+            6, "on",
+            7, "off",
+            8, "stop",
+            9, "go"
+    );
     public ONNXModelRunner(Context context) {
         this.context = context;
         try {
             env = OrtEnvironment.getEnvironment();
             String modelPath = copyAssetToInternalStorage(context, "modelo_comandos_voz.onnx");
+            String dataPath = copyAssetToInternalStorage(context, "modelo_comandos_voz.onnx.data");
 
             session = env.createSession(modelPath);
         } catch (OrtException | IOException e) {
@@ -70,14 +87,16 @@ public class ONNXModelRunner {
         }
 
         try {
+            Set<String> requestedOutputs = new HashSet<>();
+            requestedOutputs.add("output");
             Map<String, OnnxTensor> inputMap = Collections.singletonMap("input", inputTensor);
-            Result result = session.run(inputMap);
+            Result result = session.run(inputMap, requestedOutputs);
 
-            Optional<OnnxValue> optionalOutput = result.get("last_hidden_state");
+            Optional<OnnxValue> optionalOutput = result.get("output");
             if (optionalOutput.isPresent()) {
                 OnnxTensor outputTensor = (OnnxTensor) optionalOutput.get();
 
-                return Integer.toString(decodeOutput(outputTensor));
+                return decodeOutput(outputTensor);
             } else {
                 Log.e(TAG, "No output returned from the model");
                 return null;
@@ -90,24 +109,21 @@ public class ONNXModelRunner {
 
     //private OnnxTensor prepareInput()
 
-    private int decodeOutput(OnnxTensor outputTensor) throws OrtException, IOException {
-        float[][][] outputArray = (float[][][]) outputTensor.getValue();
-        for (float[][] sequence: outputArray) {
-            for (float[] tokenProbs : sequence) {
-                //Find argmax
-                int maxIndex = 0;
-                float maxValue = tokenProbs[0];
-
-                for (int i = 1; i < tokenProbs.length; i++) {
-                    if (tokenProbs[i] > maxValue) {
-                        maxValue = tokenProbs[i];
-                        maxIndex = i;
-                    }
-                }
-
-                return maxIndex;
+    private String decodeOutput(OnnxTensor outputTensor) throws OrtException, IOException {
+        float[][] outputArray = (float[][]) outputTensor.getValue();
+        if (outputArray.length == 0) return "None";
+        float[] logits = outputArray[0];
+        Log.i(TAG, Arrays.deepToString(outputArray));
+        int maxIndex = 0;
+        float maxValue = logits[0];
+        for (int i = 0; i < logits.length; i++) {
+            //Find argmax
+            if (logits[i] > maxValue) {
+                maxValue = logits[i];
+                maxIndex = i;
             }
+
         }
-        return -1;
+        return indexCommandMap.get(maxIndex);
     }
 }
