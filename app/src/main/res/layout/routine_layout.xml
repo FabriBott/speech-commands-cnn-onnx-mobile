@@ -39,110 +39,119 @@
 
         <!-- ROUTINE CARD 1 -->
         <LinearLayout
+            android:id="@+id/study_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/card_selected"
-            android:padding="16dp"
             android:layout_marginBottom="12dp"
-            android:orientation="horizontal">
+            android:background="@drawable/card_selected"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_height="wrap_content">
+                android:orientation="vertical">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tag="action_name"
                     android:text="Study Mode"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:text="Desk light on, fan low, notifications muted."
-                    android:textColor="#94A3B8"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:text="Desk light on, fan low, notifications muted."
+                    android:textColor="#94A3B8" />
             </LinearLayout>
 
             <TextView
-                android:text="GO"
-                android:textColor="#3B82F6"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:tag="action_status"
+                android:text="GO"
+                android:textColor="#3B82F6" />
         </LinearLayout>
 
         <!-- ROUTINE CARD 2 -->
         <LinearLayout
+            android:id="@+id/night_mode_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/card_normal"
-            android:padding="16dp"
             android:layout_marginBottom="12dp"
-            android:orientation="horizontal">
+            android:background="@drawable/card_normal"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_height="wrap_content">
+                android:orientation="vertical">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tag="action_name"
                     android:text="Night Mode"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:text="Warm lights, TV off, reduced brightness."
-                    android:textColor="#94A3B8"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:text="Warm lights, TV off, reduced brightness."
+                    android:textColor="#94A3B8" />
             </LinearLayout>
 
             <TextView
-                android:text="STOP"
-                android:textColor="#EF4444"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:tag="action_status"
+                android:text="STOP"
+                android:textColor="#EF4444" />
         </LinearLayout>
 
         <!-- ROUTINE CARD 3 -->
         <LinearLayout
+            android:id="@+id/welcome_home_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/card_normal"
-            android:padding="16dp"
             android:layout_marginBottom="12dp"
-            android:orientation="horizontal">
+            android:background="@drawable/card_normal"
+            android:orientation="horizontal"
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_height="wrap_content">
+                android:orientation="vertical">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:tag="action_name"
                     android:text="Welcome Home"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:text="Lights on and ambient music prepared."
-                    android:textColor="#94A3B8"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:text="Lights on and ambient music prepared."
+                    android:textColor="#94A3B8" />
             </LinearLayout>
 
             <TextView
-                android:text="GO"
-                android:textColor="#3B82F6"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:tag="action_status"
+                android:text="GO"
+                android:textColor="#3B82F6" />
         </LinearLayout>
 
         <!-- FOOTER -->

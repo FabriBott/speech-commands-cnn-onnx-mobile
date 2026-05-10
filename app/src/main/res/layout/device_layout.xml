@@ -23,13 +23,14 @@
 
         <!-- TITLE -->
         <TextView
+            android:id="@+id/selected_device_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:text="Living Room Lights"
             android:textColor="#FFFFFF"
             android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginTop="20dp"/>
+            android:textStyle="bold" />
 
         <!-- SUB -->
         <TextView
@@ -69,10 +70,11 @@
             </LinearLayout>
 
             <TextView
-                android:text="ON"
-                android:textColor="#22C55E"
+                android:id="@+id/device_status"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:text="ON"
+                android:textColor="#22C55E" />
         </LinearLayout>
 
         <!-- BOTONES -->
@@ -86,26 +88,26 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="140dp"
-                android:layout_weight="1"
                 android:layout_margin="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_normal"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/card_selected">
+                android:padding="16dp">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="Turn On"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"
                     android:textSize="18sp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:textStyle="bold" />
 
                 <TextView
-                    android:text="Activate with command on."
-                    android:textColor="#94A3B8"
-                    android:layout_marginTop="8dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Activate with command on."
+                    android:textColor="#94A3B8" />
             </LinearLayout>
 
             <!-- TURN OFF -->
@@ -136,40 +138,6 @@
         </LinearLayout>
 
         <!-- BRIGHTNESS -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#1E293B"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:text="Brightness mode"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Adjust scene intensity after confirmation."
-                    android:textColor="#94A3B8"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <TextView
-                android:text="YES"
-                android:textColor="#3B82F6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
 
         <!-- BACK -->
         <LinearLayout
@@ -211,11 +179,11 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Voice flow: on/off control device, yes confirms, no returns."
-            android:textColor="#94A3B8"
+            android:layout_marginTop="20dp"
             android:background="#1E293B"
             android:padding="16dp"
-            android:layout_marginTop="20dp"/>
+            android:text="Voice flow: on/off control device, no to go back."
+            android:textColor="#94A3B8" />
 
     </LinearLayout>
 </ScrollView>

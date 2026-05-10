@@ -109,6 +109,8 @@ public class MelSpectrogramRecorder {
     private final List<MelFrame> frameBuffer = new ArrayList<>(MAX_FRAMES);
     private final Object         frameLock   = new Object();
 
+    private String inferenceResult = "";
+
     // ── Public interfaces ─────────────────────────────────────────────────────
 
     /**
@@ -288,6 +290,7 @@ public class MelSpectrogramRecorder {
         // Run inference when recording stops
         try {
             OnnxTensor t = OnnxTensor.createTensor(modelRunner.getEnvironment(), FloatBuffer.wrap(input.data), input.shape);
+            inferenceResult = modelRunner.runInference(t);
             Log.i(TAG, "Inference result: " + modelRunner.runInference(t));
         } catch (OrtException e) {
             throw new RuntimeException(e);
@@ -306,6 +309,12 @@ public class MelSpectrogramRecorder {
     public List<MelFrame> getFrameSnapshot() {
         synchronized (frameLock) {
             return Collections.unmodifiableList(new ArrayList<>(frameBuffer));
+        }
+    }
+
+    public String getInferenceResult() {
+        synchronized (frameLock) {
+            return inferenceResult;
         }
     }
 

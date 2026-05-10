@@ -39,131 +39,144 @@
             android:layout_marginTop="20dp">
 
             <!-- CARD -->
+
             <LinearLayout
+                android:id="@+id/lights_card"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
+                android:background="@drawable/card_selected"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/card_selected">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:tag="action_name"
                     android:text="Lights"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:text="Living room and bedroom lights"
                     android:textColor="#94A3B8"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp"/>
+                    android:textSize="12sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:tag="action_status"
                     android:text="ON"
-                    android:textColor="#22C55E"
-                    android:layout_marginTop="12dp"/>
+                    android:textColor="#22C55E" />
 
             </LinearLayout>
 
             <!-- CARD -->
             <LinearLayout
+                android:id="@+id/fan_card"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
+                android:background="@drawable/card_normal"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/card_normal">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:tag="action_name"
                     android:text="Fan"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Air circulation"
-                    android:textColor="#94A3B8"/>
+                    android:textColor="#94A3B8" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:tag="action_status"
                     android:text="OFF"
-                    android:textColor="#EF4444"
-                    android:layout_marginTop="12dp"/>
+                    android:textColor="#EF4444" />
             </LinearLayout>
 
             <!-- TV -->
             <LinearLayout
+                android:id="@+id/tv_card"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
+                android:background="@drawable/card_normal"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/card_normal">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:tag="action_name"
                     android:text="TV"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Media screen"
-                    android:textColor="#94A3B8"/>
+                    android:textColor="#94A3B8" />
 
                 <TextView
+                    android:id="@+id/action_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:tag="action_status"
                     android:text="OFF"
-                    android:textColor="#EF4444"
-                    android:layout_marginTop="12dp"/>
+                    android:textColor="#EF4444" />
             </LinearLayout>
 
             <!-- ROUTINES -->
             <LinearLayout
+                android:id="@+id/routine_card"
                 android:layout_width="0dp"
                 android:layout_height="150dp"
                 android:layout_columnWeight="1"
                 android:layout_margin="8dp"
+                android:background="@drawable/card_normal"
                 android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/card_normal">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:tag="action_name"
                     android:text="Routine"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Scenes and actions"
-                    android:textColor="#94A3B8"/>
+                    android:textColor="#94A3B8" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
                     android:text="OPEN"
-                    android:textColor="#3B82F6"
-                    android:layout_marginTop="12dp"/>
+                    android:textColor="#3B82F6" />
             </LinearLayout>
 
         </GridLayout>
