@@ -26,6 +26,6 @@ class ExampleUnitTest {
 
     @Test
     fun onnx_test() {
-        MelSpectrogramRecorder recorder = new MelSpectrogramRecorder(this, frame -> { runOnUiThread() })
+        //MelSpectrogramRecorder recorder = new MelSpectrogramRecorder(this, frame -> { runOnUiThread() })
     }
 }

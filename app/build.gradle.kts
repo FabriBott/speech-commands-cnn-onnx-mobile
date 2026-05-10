@@ -46,6 +46,7 @@ dependencies {
     //implementation("be.tarsos.dsp:core:2.5")
     //implementation("be.tarsos.dsp:jvm:2.5")
     implementation(files("libs/TarsosDSP-Android-latest.jar"))
+    implementation(files("libs/jlibrosa-1.1.8-SNAPSHOT-jar-with-dependencies.jar"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

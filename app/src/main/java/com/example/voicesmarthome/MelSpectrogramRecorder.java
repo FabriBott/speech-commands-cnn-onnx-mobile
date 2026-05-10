@@ -7,6 +7,8 @@ import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 
+import com.jlibrosa.audio.JLibrosa;
+
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,19 +96,22 @@ public class MelSpectrogramRecorder {
     private final TensorReadyListener tensorListener;
 
     private ONNXModelRunner modelRunner;
-
+    private JLibrosa jLibrosa = new JLibrosa();
     private AudioDispatcher dispatcher;
     private Thread          dispatcherThread;
 
     private final FFT     fft;
     private final float[] hannCoefficients;
 
+    private double startTimestamp = 0;
+    private double endTimestamp = 0;
     /**
      * Circular frame buffer – access always synchronised on frameLock.
      * Using ArrayList + manual head-pointer eviction avoids per-frame allocation
      * while keeping the code readable.
      */
     private final List<MelFrame> frameBuffer = new ArrayList<>(MAX_FRAMES);
+    ArrayList<float[]> recordingBuffer = new ArrayList<>(MAX_FRAMES);
     private final Object         frameLock   = new Object();
 
     // ── Public interfaces ─────────────────────────────────────────────────────
@@ -255,9 +260,19 @@ public class MelSpectrogramRecorder {
 
         synchronized (frameLock) { frameBuffer.clear(); }
 
+        //clear custom recording buffer
+        synchronized (frameLock) {
+            for (int i = 0; i < recordingBuffer.size(); i++) {
+                float[] newFrame = new float[FFT_SIZE];
+                Arrays.fill(newFrame, 0);
+                recordingBuffer.add(newFrame);
+            }
+        }
+
         dispatcher = AudioDispatcherFactory.fromDefaultMicrophone(SAMPLE_RATE, FFT_SIZE, FFT_SIZE - HOP_SIZE);
 
-        dispatcher.addAudioProcessor(buildMelProcessor());
+        //dispatcher.addAudioProcessor(buildMelProcessor());
+        dispatcher.addAudioProcessor(buildJLibrosaMelProcessor());
 
         dispatcherThread = new Thread(dispatcher, "MelSpectrogram-AudioThread");
         dispatcherThread.setDaemon(true);
@@ -284,7 +299,15 @@ public class MelSpectrogramRecorder {
             dispatcherThread = null;
         }
         Log.i(TAG, "Recording stopped. Frames in buffer: " + getFrameCount());
-        OnnxTensorInput input = buildTensorNow();
+        float[] recordingData = flattenRecordingList(recordingBuffer);
+        float[][] melSpecData =  jLibrosa.generateMelSpectroGram(recordingData, SAMPLE_RATE, FFT_SIZE, NUM_MEL_BANDS, HOP_SIZE);
+        Log.i(TAG, Arrays.toString(melSpecData[0]));
+        OnnxTensorInput input = null;//buildTensorNow();
+        synchronized (frameLock) {
+            if (frameBuffer.isEmpty()) input = null;
+            input = packDataToTensor(melSpecData);
+        }
+
         // Run inference when recording stops
         try {
             OnnxTensor t = OnnxTensor.createTensor(modelRunner.getEnvironment(), FloatBuffer.wrap(input.data), input.shape);
@@ -329,6 +352,7 @@ public class MelSpectrogramRecorder {
             if (frameBuffer.isEmpty()) return null;
             return packFramesToTensor(new ArrayList<>(frameBuffer));
         }
+
     }
 
     // ── DSP processor ─────────────────────────────────────────────────────────
@@ -406,6 +430,48 @@ public class MelSpectrogramRecorder {
         };
     }
 
+    private AudioProcessor buildJLibrosaMelProcessor() {
+
+
+        return new AudioProcessor() {
+
+            @Override
+            public boolean process(AudioEvent audioEvent) {
+                float[] audioBuffer = audioEvent.getFloatBuffer();
+                Log.i(TAG, Integer.toString(audioBuffer.length));
+                if (audioBuffer.length < FFT_SIZE) return true;
+
+
+
+                // 5. Build frame and push into circular buffer
+                OnnxTensorInput tensor = null;
+
+                synchronized (frameLock) {
+                    if (recordingBuffer.size() >= MAX_FRAMES) {
+                        recordingBuffer.remove(0); // evict oldest frame
+                    }
+                    recordingBuffer.add(audioBuffer);
+
+                    // Fire tensor callback every time the buffer is full
+                    if (recordingBuffer.size() == MAX_FRAMES && tensorListener != null) {
+                        //tensor = packFramesToTensor(frameBuffer);
+                    }
+                }
+
+                // 6. Deliver callbacks outside the lock to avoid contention
+                //if (frameListener != null) frameListener.onMelFrame(frame);
+                if (tensor != null)        tensorListener.onTensorReady(tensor);
+
+                return true;
+            }
+
+            @Override
+            public void processingFinished() {
+                Log.d(TAG, "Audio processing finished.");
+            }
+        };
+    }
+
     // ── Tensor packing ────────────────────────────────────────────────────────
 
     /**
@@ -433,6 +499,35 @@ public class MelSpectrogramRecorder {
         double endTs   = frames.get(numFrames - 1).timeStampSeconds;
 
         return new OnnxTensorInput(data, shape, numFrames, startTs, endTs);
+    }
+
+    static OnnxTensorInput packDataToTensor(float[][] melSpecData) {
+        int numFrames = melSpecData.length;
+        float[] data  = new float[MAX_FRAMES * NUM_MEL_BANDS];
+        Arrays.fill(data, 0);
+
+        for (int t = 0; t < MAX_FRAMES; t++) {
+            System.arraycopy(melSpecData[t], 0,
+                    data, t * NUM_MEL_BANDS, NUM_MEL_BANDS);
+        }
+
+        long[] shape = {1L, 1L, (long) NUM_MEL_BANDS, (long) MAX_FRAMES};
+
+        double startTs = 0;
+        double endTs   = 1;
+
+        return new OnnxTensorInput(data, shape, numFrames, startTs, endTs);
+    }
+
+    private float[] flattenRecordingList(ArrayList<float[]> recordingBuffer) {
+        float[] flattenedRecording = new float[MAX_FRAMES*FFT_SIZE];
+        for (int i = 0; i < recordingBuffer.size(); i++) {
+            float[] recordingFrame = recordingBuffer.get(i);
+            System.arraycopy(recordingFrame, 0, flattenedRecording, i*FFT_SIZE, FFT_SIZE);
+        }
+        Log.i(TAG, "Printing flattened recording");
+        Log.i(TAG, Arrays.toString(flattenedRecording));
+        return flattenedRecording;
     }
 
     // ── Mel maths ─────────────────────────────────────────────────────────────
